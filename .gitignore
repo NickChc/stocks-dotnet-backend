@@ -1,0 +1,30 @@
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+
+# Visual Studio Code
+.vscode/
+
+# Packages
+*.nupkg
+*.snupkg
+packages/
+*.vsix
+
+# Other
+.DS_Store
+Thumbs.db
+
+
+# Ignore development settings
+appsettings.Development.json
