@@ -14,7 +14,11 @@ public class StockRepo(ApplicationDbContext dbContext) : IStockRepo
 
     public async Task<(int, List<Stock>)> GetAllAsync(QueryObject query)
     {
-        var stocks = _context.Stock.Include((s) => s.Comments).AsQueryable().AsNoTracking();
+        var stocks = _context
+            .Stock.Include((s) => s.Comments)
+            .ThenInclude((c) => c.AppUser)
+            .AsQueryable()
+            .AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(query.CompanyName))
         {
@@ -48,6 +52,7 @@ public class StockRepo(ApplicationDbContext dbContext) : IStockRepo
     {
         return await _context
             .Stock.Include((s) => s.Comments)
+            .ThenInclude((c) => c.AppUser)
             .FirstOrDefaultAsync((s) => s.Id == id);
     }
 
@@ -55,6 +60,7 @@ public class StockRepo(ApplicationDbContext dbContext) : IStockRepo
     {
         return await _context
             .Stock.Include((s) => s.Comments)
+            .ThenInclude((c) => c.AppUser)
             .FirstOrDefaultAsync((s) => s.Symbol == symbols);
     }
 

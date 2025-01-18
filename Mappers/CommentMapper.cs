@@ -14,6 +14,7 @@ public static class CommentMapper
             CreatedOn = comment.CreatedOn,
             StockId = comment.StockId,
             Title = comment.Title,
+            CreatedBy = comment.AppUser!.UserName!,
         };
     }
 

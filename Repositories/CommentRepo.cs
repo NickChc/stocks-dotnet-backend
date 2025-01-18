@@ -11,12 +11,14 @@ public class CommentRepo(ApplicationDbContext context) : ICommentRepo
 
     public async Task<List<Comment>> GetAllAsync()
     {
-        return await _context.Comment.AsNoTracking().ToListAsync();
+        return await _context.Comment.Include((c) => c.AppUser).AsNoTracking().ToListAsync();
     }
 
     public async Task<Comment?> GetByIdAsync(int id)
     {
-        var comment = await _context.Comment.FindAsync(id);
+        var comment = await _context
+            .Comment.Include((c) => c.AppUser)
+            .FirstOrDefaultAsync((c) => c.Id == id);
 
         if (comment is null)
         {
