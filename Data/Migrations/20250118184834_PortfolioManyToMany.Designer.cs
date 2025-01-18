@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace api.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250117113818_SeedRoles")]
-    partial class SeedRoles
+    [Migration("20250118184834_PortfolioManyToMany")]
+    partial class PortfolioManyToMany
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.1")
+                .HasAnnotation("ProductVersion", "8.0.12")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -116,7 +116,22 @@ namespace api.Data.Migrations
 
                     b.HasIndex("StockId");
 
-                    b.ToTable("Comment");
+                    b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("Api.Models.Portfolio", b =>
+                {
+                    b.Property<string>("AppUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("StockId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AppUserId", "StockId");
+
+                    b.HasIndex("StockId");
+
+                    b.ToTable("Portfolios");
                 });
 
             modelBuilder.Entity("Api.Models.Stock", b =>
@@ -150,7 +165,7 @@ namespace api.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Stock");
+                    b.ToTable("Stocks");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -182,13 +197,13 @@ namespace api.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "718d86f8-970a-402f-b703-94128b4d7ed4",
+                            Id = "admin-role-ID",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "92309a5a-cb88-4fe0-8d11-0ba2d88b7700",
+                            Id = "user-role-ID",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -309,6 +324,25 @@ namespace api.Data.Migrations
                     b.Navigation("Stock");
                 });
 
+            modelBuilder.Entity("Api.Models.Portfolio", b =>
+                {
+                    b.HasOne("Api.Models.AppUser", "AppUser")
+                        .WithMany("Portfolios")
+                        .HasForeignKey("AppUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Api.Models.Stock", "Stock")
+                        .WithMany("Portfolios")
+                        .HasForeignKey("StockId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AppUser");
+
+                    b.Navigation("Stock");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -360,9 +394,16 @@ namespace api.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Api.Models.AppUser", b =>
+                {
+                    b.Navigation("Portfolios");
+                });
+
             modelBuilder.Entity("Api.Models.Stock", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("Portfolios");
                 });
 #pragma warning restore 612, 618
         }
