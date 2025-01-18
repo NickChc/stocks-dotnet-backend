@@ -28,4 +28,31 @@ public class PortfolioRepo(ApplicationDbContext dbContext) : IPortfolioRepo
             )
             .ToListAsync();
     }
+
+    public async Task<Portfolio> CreateAsync(Portfolio portfolio)
+    {
+        await _dbContext.Portfolios.AddAsync(portfolio);
+        await _dbContext.SaveChangesAsync();
+
+        return portfolio;
+    }
+
+    public async Task<Portfolio?> DeleteAsync(AppUser appUser, string symbol)
+    {
+        Portfolio? portfolio = await _dbContext
+            .Portfolios.Include((p) => p.Stock)
+            .FirstOrDefaultAsync(
+                (p) => p.AppUserId == appUser.Id && p.Stock!.Symbol.ToLower() == symbol.ToLower()
+            );
+
+        if (portfolio is null)
+        {
+            return null;
+        }
+
+        _dbContext.Portfolios.Remove(portfolio);
+        await _dbContext.SaveChangesAsync();
+
+        return portfolio;
+    }
 }
